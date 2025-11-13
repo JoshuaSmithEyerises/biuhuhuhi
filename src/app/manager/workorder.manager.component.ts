@@ -81,7 +81,11 @@ export class WorkOrderManagerComponent implements OnInit {
       // Fetch appliance data using the foreign key (applianceID)
       const address = await this.getAddress(w.applianceID);
 
-      return { ...w, created, address };
+      console.log(`WorkOrder ID: ${w.id}, ApplianceID: ${w.applianceID}, Address: ${address}`);
+
+      console.log(`WorkOrder ID: ${w.id}, ApplianceID: ${w.applianceID}`);
+
+      return { ...w, created, address };  
     })
   );
 
@@ -112,11 +116,11 @@ export class WorkOrderManagerComponent implements OnInit {
     }
   }
 
-  async getAddress(applianceID: string): Promise<string> {
-    if (!applianceID) return 'Unknown';
+  async getAddress(ApplianceID: string): Promise<string> {
+    if (!ApplianceID) return 'Unknown';
 
     try {
-      const appliance: Appliance | undefined = await this.applianceService.getApplianceById(applianceID);
+      const appliance: Appliance | undefined = await this.applianceService.getApplianceById(ApplianceID);
       return appliance?.address || 'Unknown';
     } catch (err) {
       console.error('Error fetching appliance address:', err);

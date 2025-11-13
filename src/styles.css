@@ -120,9 +120,9 @@ body { margin: 0;
 .go-back{
     display: flex;
     position: fixed;
-    top:0;
-    left:0;
-    margin:10;
+    top:0px;
+    left:0px;
+    margin:10px;
 }
 
 .go-back img{
@@ -279,7 +279,7 @@ ul li .table-cell{
 
 .work-order-side-panel h2{
     text-align: center;
-    white-space: no-wrap;
+    white-space: nowrap;
 }
 
 form {
