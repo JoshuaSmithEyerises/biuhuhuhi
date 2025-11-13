@@ -36,14 +36,6 @@ html, body { height: 100%;
     overflow-x: hidden;
 }
 
-a {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: normal;
-    text-transform: uppercase;
-    font-size: 30px;
-    color: #bad5d5;
-}
-
 a:hover {
     color:#92DCE5
 }
@@ -111,7 +103,7 @@ body { margin: 0;
 .launch img{
     position:fixed;
     top: -180px;
-    right: 250px;
+    left: 50px;
     max-width: 1150;
     max-height: auto;
 }
@@ -190,13 +182,12 @@ Component specific styling*/
      align-self: flex-end;
      margin-left: 190%;
      white-space: nowrap;
-     background-color: transparent;
+     background-color: #bad5d5;
      box-shadow: none;
      font-family: 'Montserrat', sans-serif;
      font-weight: normal;
      text-transform: uppercase;
      font-size: 30px;
-     color: #bad5d5;
      text-decoration: underline;
    
 }
@@ -323,4 +314,12 @@ form button {
     border-radius: 25px;
     cursor: pointer;
 
+}
+
+a {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 30px;
+    color: #3E78B2;
 }
