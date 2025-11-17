@@ -8,7 +8,25 @@ import { AuthService } from '../auth.service';
     selector: 'app-tenant-login',
     standalone: true,
     imports: [CommonModule, FormsModule, RouterLink],
-    templateUrl: "./tenant-login-component.html",
+    template: `
+    <div>
+  <h1>Please Enter your tenant key</h1>
+
+  <div class = 'center-text-form'>
+  <!-- Tenant passkey form -->
+  <input type="text" [(ngModel)]="passkey" placeholder="Enter Passkey" />
+  <br /><br />
+  <button (click)="login()">Submit</button><br>
+  <a routerLink="/login/fail">I forgot/don't know id</a>
+  </div>
+ 
+
+  <!-- Error message -->
+  <p *ngIf="errorMessage" style="color:red;">{{ errorMessage }}</p>
+
+</div>
+
+    `
 })
 
 export class TenantLoginComponent {

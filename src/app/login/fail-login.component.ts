@@ -7,7 +7,13 @@ import { AuthService } from '../auth.service';
     selector: 'fail-login-component',
     standalone: true,
     imports: [CommonModule],
-    templateUrl:"./fail-login.component.html",
+    template: `
+    
+    <h1>Please contact your system admin or property manager for login information</h1>
+<button onclick="window.location.href='mailto:lloydar@g.cofc.edu'">
+  Contact System Admin
+</button>
+`
 })
 
 /*

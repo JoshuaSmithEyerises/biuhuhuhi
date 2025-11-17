@@ -7,7 +7,22 @@ import { AuthService } from '../auth.service';
     selector: 'launch-login',
     standalone: true,
     imports: [CommonModule, RouterLink],
-    templateUrl:"./launch-login-component.html",
+    template:`
+    <div class = 'launch'>
+<h1>I am a...</h1>
+  <img src="Logo.png" alt="Logo">
+
+
+  <div class = 'left-side-buttons'>
+  <a routerLink="/login/tenant">Tenant</a>
+  <br>
+  <a routerLink="/login/manager">Property Manager</a>
+  <div class ='left-side-link'>
+  <a routerLink="/login/fail">register new account</a>
+  </div>
+  </div>
+  </div>
+  `
 })
 
 /*
