@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- Import ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -74,6 +74,10 @@ export class TenantDashboardComponent implements OnInit {
     }
   }
 
+  prepareWorkOrder(id: string) {
+  this.newWorkOrder.applianceID = id;
+  this.addWorkOrder();
+}
 
   async logout() {
     await this.auth.logout();

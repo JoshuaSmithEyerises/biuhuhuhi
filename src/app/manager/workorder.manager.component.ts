@@ -10,7 +10,7 @@ import { Appliance } from '../services/appliance.service';
 @Component({
   selector: 'app-manager-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ],
+  imports: [CommonModule, FormsModule, ],
   template: `
     <div>
       <h1>Work Orders</h1>
