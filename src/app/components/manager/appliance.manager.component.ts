@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../auth.service';
 import { FormsModule } from '@angular/forms';
-import { ApplianceService } from '../services/appliance.service';
+import { ApplianceService } from '../../services/appliance.service';
 
 @Component({
   selector: 'app-manager-dashboard',

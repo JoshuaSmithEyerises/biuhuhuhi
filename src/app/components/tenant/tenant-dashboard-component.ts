@@ -1,16 +1,59 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
-import { ApplianceService } from '../services/appliance.service';
-import { WorkOrderService } from '../services/workorder.service';
+import { AuthService } from '../../auth.service';
+import { ApplianceService } from '../../services/appliance.service';
+import { WorkOrderService } from '../../services/workorder.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-tenant-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './tenant-dashboard.component.html'
+  template: `
+  <div>
+  <h1>Welcome, {{ auth.tenant?.address }}</h1>
+  <h2>Access granted with passkey: {{ auth.tenant?.passkey }}</h2>
+
+ <form (ngSubmit)="addWorkOrder()">
+  <input type="text" placeholder="applianceID" [(ngModel)]="newWorkOrder.applianceID" name="applianceID" required />
+  <input type="text" placeholder="Notes" [(ngModel)]="newWorkOrder.notes" name="notes" required />
+  <button type="submit">File WorkOrder</button>
+</form>
+
+
+<ul *ngIf="appliances.length > 0; else noAppliances">
+
+  <li class="header-row">
+    <div class='table-cell'><strong>Type</strong></div>
+    <div class='table-cell'><strong>Model</strong></div>
+    <div class='table-cell'><strong>Serial No</strong></div>
+    <div class='table-cell'><strong>&nbsp;</strong></div>
+  </li>
+
+  <li *ngFor="let appliance of appliances">
+    <div class='table-cell'>{{ appliance.type }}</div>
+    <div class='table-cell'>{{ appliance.model }}</div>
+    <div class='table-cell'>{{ appliance.serial }}</div>
+
+    <div class="table-cell">
+      <button type="button" (click)="prepareWorkOrder(appliance.id)">
+        File WorkOrder
+      </button>
+    </div>
+
+  </li>
+
+</ul>
+
+<ng-template #noAppliances>
+  <p>No appliances found for your address.</p>
+</ng-template>
+   </div>
+   <button (click)="logout()">Logout</button>
+
+  
+  `
 })
 export class TenantDashboardComponent implements OnInit {
   appliances: any[] = [];

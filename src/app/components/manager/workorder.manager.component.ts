@@ -1,11 +1,11 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { AuthService } from '../auth.service';
-import { WorkOrderService } from '../services/workorder.service';
-import { ApplianceService } from '../services/appliance.service';
+import { AuthService } from '../../auth.service';
+import { WorkOrderService } from '../../services/workorder.service';
+import { ApplianceService } from '../../services/appliance.service';
 import { FormsModule } from '@angular/forms';
-import { Appliance } from '../services/appliance.service';
+import { Appliance } from '../../services/appliance.service';
 
 @Component({
   selector: 'app-manager-dashboard',
