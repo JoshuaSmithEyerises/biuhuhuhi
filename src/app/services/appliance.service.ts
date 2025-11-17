@@ -52,20 +52,13 @@ export class ApplianceService {
   }
 
  async getApplianceById(id: string): Promise<Appliance | undefined> {
-  try {
-    const docRef = doc(this.firestore, 'Appliances', id);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      // Spread data first, then overwrite 'id'
-      return { ...(docSnap.data() as Appliance), id: docSnap.id };
-    } else {
-      return undefined;
-    }
-  } catch (error) {
-    console.error('Error fetching appliance by ID:', error);
-    return undefined;
+  const docRef = doc(this.firestore, 'Appliances', id);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const data = docSnap.data() as Appliance;
+    return { ...data, id: data.id || docSnap.id };
   }
+  return undefined;
 }
 
   async getAppliancesByAddress(address: string) {
