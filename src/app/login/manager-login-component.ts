@@ -9,7 +9,22 @@ import { AuthService } from '../auth.service';
   selector: 'app-manager-login',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: "./manager-login-component.html"
+  template:`
+  
+  <h1>Welcome, Property Manager</h1>
+  <!-- Simple form for email/password -->
+   <div class = 'center-text-form'>
+  <input type="email" [(ngModel)]="email" placeholder="Email" />
+  <br /><br />
+  <input type="password" [(ngModel)]="password" placeholder="Password" />
+  <br /><br />
+  <button (click)="login()">Submit</button><br>
+  <a routerLink="/login/fail">I forgot/don't know login</a>
+  </div>
+  <!-- Error display -->
+  <p *ngIf="errorMessage" style="color:red;">{{ errorMessage }}</p>
+  
+  `
 })
 
 export class ManagerLoginComponent { 
