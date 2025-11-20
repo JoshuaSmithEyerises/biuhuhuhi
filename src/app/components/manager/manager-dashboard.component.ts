@@ -38,8 +38,8 @@ import { WorkOrderService } from '../../services/workorder.service';
   <br>
   <a routerLink="/manager/appliances">Manage Appliances</a>
   <!-- TODO For Future Inclusion  <a routerLink="/manager/workorders">View Work Orders</a> -->
-<button (click)="logout()">Logout</button>
-</div>
+<button (click)="logout()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Logout</button>
+</div><!--just hacking something together atp-->
   `
 })
 

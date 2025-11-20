@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { ApplianceService, Appliance } from '../services/appliance.service';
 import { WorkOrderService } from '../services/workorder.service';
@@ -37,12 +37,18 @@ import { FormsModule } from '@angular/forms';
       />
       <button type="submit">File WorkOrder</button>
     </form>
+
+      <div *ngIf="successMessage" class="success-message"><h2>
+      {{ successMessage }}</h2>
+    </div>
+
   </div>
   `
 })
 export class FileWorkOrderComponent implements OnInit {
   appliances: Appliance[] = [];
   selectedAppliance: Appliance | undefined;
+  successMessage: string = '';
 
   newWorkOrder = {
     applianceID: '',
@@ -54,7 +60,6 @@ export class FileWorkOrderComponent implements OnInit {
 
   constructor(
     public auth: AuthService,
-    private router: Router,
     private route: ActivatedRoute,
     private applianceService: ApplianceService,
     private workOrderService: WorkOrderService,
@@ -78,20 +83,24 @@ export class FileWorkOrderComponent implements OnInit {
     });
   }
 
-  async addWorkOrder() {
+   async addWorkOrder() {
     try {
       const id = await this.workOrderService.createWorkOrder(this.newWorkOrder);
       console.log('Work order filed with ID:', id);
 
-      // Clear form
+      // Clear form fields
       this.newWorkOrder.notes = '';
       this.newWorkOrder.status = '';
       this.newWorkOrder.created = '';
       this.newWorkOrder.updated = '';
 
+      // Show success message
+      this.successMessage = 'Work order filed successfully!';
+
       this.cdr.detectChanges();
     } catch (error) {
       console.error('Failed to file work order:', error);
+      this.successMessage = 'Failed to file work order. Please try again.';
     }
   }
 }
