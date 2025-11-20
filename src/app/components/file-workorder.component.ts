@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { ApplianceService, Appliance } from '../services/appliance.service';
 import { WorkOrderService } from '../services/workorder.service';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'file-workorder',
@@ -12,17 +12,17 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule],
   template: `
   <div>
-    <h1>File Work Order</h1>
+    <h1>{{ isEdit ? 'Edit' : 'File' }} Work Order</h1>
 
     <h2 *ngIf="selectedAppliance">
-      Filing work order for {{ selectedAppliance.type }} {{ selectedAppliance.model }} <br>
+      {{ isEdit ? 'Editing' : 'Filing' }} work order for {{ selectedAppliance.type }} {{ selectedAppliance.model }} <br>
       at {{ selectedAppliance.address || auth.tenant?.address }}
     </h2>
 
-    <form (ngSubmit)="addWorkOrder()">
+    <form (ngSubmit)="submitForm()">
       <input 
         type="text" 
-        placeholder="applianceID" 
+        placeholder="ApplianceID" 
         [(ngModel)]="newWorkOrder.applianceID" 
         name="applianceID" 
         readonly 
@@ -35,28 +35,24 @@ import { FormsModule } from '@angular/forms';
         name="notes" 
         required 
       />
-      <button type="submit">File WorkOrder</button>
+      <button type="submit">{{ isEdit ? 'Save Changes' : 'File WorkOrder' }}</button>
     </form>
 
-      <div *ngIf="successMessage" class="success-message"><h2>
-      {{ successMessage }}</h2>
+    <div *ngIf="successMessage" class="success-message">
+      <h2>{{ successMessage }}</h2>
     </div>
-
   </div>
   `
 })
 export class FileWorkOrderComponent implements OnInit {
-  appliances: Appliance[] = [];
-  selectedAppliance?: Appliance;
-  successMessage = '';
-  isEdit = false;
-
   newWorkOrder: any = {
-    id: '',
     applianceID: '',
     notes: '',
-    status: 0,
+    status: 0
   };
+  selectedAppliance?: Appliance;
+  isEdit = false;
+  successMessage = '';
 
   constructor(
     public auth: AuthService,
@@ -68,43 +64,53 @@ export class FileWorkOrderComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // Load appliances
-    const tenantAddress = this.auth.tenant?.address;
-    this.appliances = tenantAddress
-      ? await this.applianceService.getAppliancesByAddress(tenantAddress)
-      : await this.applianceService.getAllAppliances();
+    // Check if editing a workorder via route param
+    const workorderId = this.route.snapshot.paramMap.get('id');
 
-    // Check if editing a work order by route param
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    if (workorderId) {
       this.isEdit = true;
-      const workorder = await this.workOrderService.getWorkOrderById(id);
-      if (workorder) {
-        this.newWorkOrder = {
-          id,
-          applianceID: workorder.applianceID,
-          notes: workorder.notes,
-          status: workorder.status,
-        };
-        this.selectedAppliance = await this.applianceService.getApplianceById(workorder.applianceID);
-      }
-      this.cdr.detectChanges();
-      return;
-    }
 
-    // Otherwise, prefill applianceID from query param if provided
-    this.route.queryParams.subscribe(async params => {
-      if (params['applianceID']) {
-        this.newWorkOrder.applianceID = params['applianceID'];
-        this.selectedAppliance = await this.applianceService.getApplianceById(params['applianceID']);
-        this.cdr.detectChanges();
+      // Fetch workorder by its primary key (id)
+      const workorder = await this.workOrderService.getWorkOrderById(workorderId);
+      if (!workorder) {
+        console.error('Workorder not found:', workorderId);
+        this.router.navigate(['/manager/workorders']);
+        return;
       }
-    });
+
+      // Prefill form fields
+      this.newWorkOrder = {
+  id: workorder.id,      
+  applianceID: workorder.applianceID,
+  notes: workorder.notes,
+  status: workorder.status
+};
+
+      // Fetch the appliance for display
+      this.selectedAppliance = await this.applianceService.getApplianceById(workorder.applianceID);
+
+      this.cdr.detectChanges();
+    } else {
+      // Filing new workorder
+      this.isEdit = false;
+
+      // Only prefill applianceID from query param if provided
+      this.route.queryParams.subscribe(async params => {
+        if (params['applianceID']) {
+          this.newWorkOrder.applianceID = params['applianceID'];
+          this.selectedAppliance = await this.applianceService.getApplianceById(params['applianceID']);
+          this.cdr.detectChanges();
+        }
+      });
+    }
   }
 
-  submitForm() {
-    if (this.isEdit) this.saveChanges();
-    else this.addWorkOrder();
+  async submitForm() {
+    if (this.isEdit) {
+      await this.saveChanges();
+    } else {
+      await this.addWorkOrder();
+    }
   }
 
   async addWorkOrder() {
@@ -114,18 +120,21 @@ export class FileWorkOrderComponent implements OnInit {
       this.newWorkOrder.notes = '';
       this.cdr.detectChanges();
     } catch (error) {
-      console.error(error);
+      console.error('Error filing workorder:', error);
       this.successMessage = 'Failed to file work order.';
     }
   }
 
   async saveChanges() {
     try {
+      if (!this.newWorkOrder.id) {
+        throw new Error('Cannot save changes: WorkOrder ID missing.');
+      }
       await this.workOrderService.updateWorkOrder(this.newWorkOrder);
       this.successMessage = 'Work order updated successfully!';
       this.cdr.detectChanges();
     } catch (error) {
-      console.error(error);
+      console.error('Error updating workorder:', error);
       this.successMessage = 'Failed to update work order.';
     }
   }

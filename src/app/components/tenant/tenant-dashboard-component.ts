@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; 
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth.service';
-import { ApplianceService } from '../../services/appliance.service';
+import { ApplianceService, Appliance } from '../../services/appliance.service';
 import { WorkOrderService } from '../../services/workorder.service';
 import { FormsModule } from '@angular/forms';
 
@@ -12,118 +12,113 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule],
   template: `
   <div>
-  <h1>Welcome, {{ auth.tenant?.address }}</h1>
-  <h2>Access granted with passkey: {{ auth.tenant?.passkey }}</h2>
+    <h1>Welcome, {{ auth.tenant?.address }}</h1>
+    <h2>Access granted with passkey: {{ auth.tenant?.passkey }}</h2>
 
-<ul *ngIf="appliances.length > 0; else noAppliances">
+    <h2>Appliances</h2>
+    <ul *ngIf="appliances.length; else noAppliances">
+      <li class="header-row">
+        <div class='table-cell'><strong>Type</strong></div>
+        <div class='table-cell'><strong>Model</strong></div>
+        <div class='table-cell'><strong>Serial No</strong></div>
+        <div class='table-cell'><strong>&nbsp;</strong></div>
+      </li>
 
-  <li class="header-row">
-    <div class='table-cell'><strong>Type</strong></div>
-    <div class='table-cell'><strong>Model</strong></div>
-    <div class='table-cell'><strong>Serial No</strong></div>
-    <div class='table-cell'><strong>&nbsp;</strong></div>
-  </li>
+      <li *ngFor="let appliance of appliances">
+        <div class='table-cell'>{{ appliance.type }}</div>
+        <div class='table-cell'>{{ appliance.model }}</div>
+        <div class='table-cell'>{{ appliance.serial }}</div>
+        <div class="table-cell">
+          <button type="button" (click)="fileWorkOrder(appliance)">File WorkOrder</button>
+        </div>
+      </li>
+    </ul>
 
-  <li *ngFor="let appliance of appliances">
-    <div class='table-cell'>{{ appliance.type }}</div>
-    <div class='table-cell'>{{ appliance.model }}</div>
-    <div class='table-cell'>{{ appliance.serial }}</div>
+    <ng-template #noAppliances>
+      <p>No appliances found for your address.</p>
+    </ng-template>
 
-    <div class="table-cell">
-       <button type="button" (click)="goToWorkOrder(appliance.id)">
-        File WorkOrder
-      </button>
-    </div>
+    <h2>Active Work Orders</h2>
+    <ul *ngIf="workorders.length; else noWorkOrders">
+      <li class="header-row">
+        <div class='table-cell'><strong>Appliance</strong></div>
+        <div class='table-cell'><strong>Notes</strong></div>
+        <div class='table-cell'><strong>Status</strong></div>
+      </li>
 
-  </li>
+      <li *ngFor="let w of workorders">
+        <div class='table-cell'>{{ w.appliance?.type }} {{ w.appliance?.model }}</div>
+        <div class='table-cell'>{{ w.notes }}</div>
+        <div class='table-cell'>{{ getStatusText(w.status) }}</div>
+      </li>
+    </ul>
 
-</ul>
+    <ng-template #noWorkOrders>
+      <p>No active work orders for your appliances.</p>
+    </ng-template>
 
-<ng-template #noAppliances>
-  <p>No appliances found for your address.</p>
-</ng-template>
-   </div>
-   <form>
-   <button (click)="logout()">Logout</button>
-</form>
-  
+    <form>
+      <button (click)="logout()">Logout</button>
+    </form>
+  </div>
   `
 })
 export class TenantDashboardComponent implements OnInit {
-  appliances: any[] = [];
-
+  appliances: Appliance[] = [];
   workorders: any[] = [];
-
-    newWorkOrder = {
-    applianceID: '',
-    created: '',
-    notes: '',
-    status:'',
-    updated:'',
-
-    }
 
   constructor(
     public auth: AuthService,
     private router: Router,
     private applianceService: ApplianceService,
-     private workOrderService: WorkOrderService,
-    private cdr: ChangeDetectorRef 
+    private workOrderService: WorkOrderService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
     const tenantAddress = this.auth.tenant?.address;
-    console.log('Tenant address:', tenantAddress);
+    if (!tenantAddress) return;
 
-    if (!tenantAddress) {
-      console.warn('Tenant has no address — cannot load appliances.');
-      return;
-    }
-
-    // Fetch all appliances where address == tenantAddress
+    // Fetch all appliances for this tenant
     this.appliances = await this.applianceService.getAppliancesByAddress(tenantAddress);
-    console.log('Appliances found:', this.appliances);
 
-    this.cdr.detectChanges(); // <-- Tell Angular to update the view
+    // Fetch all active work orders
+    const allWorkOrders = await this.workOrderService.getActiveWorkOrders();
+
+    // Filter work orders to only those whose appliance has the same address
+    this.workorders = await Promise.all(
+      allWorkOrders.map(async w => {
+        const appliance = await this.applianceService.getApplianceById(w.applianceID);
+        if (appliance?.address === tenantAddress) {
+          return { ...w, appliance };
+        }
+        return null;
+      })
+    );
+
+    // Remove nulls
+    this.workorders = this.workorders.filter(w => w !== null);
+
+    this.cdr.detectChanges();
   }
 
-  goToWorkOrder(applianceId: string) {
+  fileWorkOrder(appliance: Appliance) {
     this.router.navigate(['/tenant/fileworkorder'], {
-      queryParams: { applianceID: applianceId }
+      queryParams: { applianceID: appliance.id }
     });
   }
 
-  async addWorkOrder() {
-    try {
-      const id = await this.workOrderService.createWorkOrder(this.newWorkOrder);
-      console.log('Appliance added with ID:', id);
-
-      // Refresh all workorders (manager view)
-      this.workorders = await this.workOrderService.getAllWorkOrders();
-      
-
-      // Clear form after adding
-      this.newWorkOrder = {
-        applianceID: '',
-        created: '',
-        notes: '',
-        status:'',
-        updated:'',
-      };
-
-      this.cdr.detectChanges(); // Trigger UI update
-    } catch (error) {
-      console.error('Failed to add appliance:', error);
-    }
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/login/tenant']);
   }
 
-  prepareWorkOrder(id: string) {
-  this.newWorkOrder.applianceID = id;
-  this.addWorkOrder();
-}
-
-  async logout() {
-    await this.auth.logout();
-    this.router.navigate(['/login/tenant']);
+  getStatusText(status: number) {
+    switch (status) {
+      case 0: return 'New';
+      case 1: return 'In Progress';
+      case 2: return 'Completed';
+      default: return 'Unknown';
+    }
   }
 }
