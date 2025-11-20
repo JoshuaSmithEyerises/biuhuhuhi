@@ -3,7 +3,6 @@ import {
   Firestore,
   doc,
   deleteDoc,
-  getDoc,
   getDocs,
   collection,
   query,
@@ -14,6 +13,7 @@ import {
   addDoc,
   updateDoc,
   Timestamp,
+  getDoc,
 } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
@@ -24,86 +24,82 @@ export class WorkOrderService {
     this.workordersRef = collection(this.firestore, 'WorkOrders');
   }
 
-  /** Get all active work orders (optionally ordered by creation date) */ 
-  async getActiveWorkOrders(): Promise<any[]> 
-  { const q = query(this.workordersRef, where('status', '!=', 2)); 
-    const snapshot = await getDocs(q); return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); }
-  
-async getAllWorkOrders(): Promise<any[]>{
-  const q = query(this.workordersRef,  orderBy('created', 'desc'));
+  /** Fetch a single workorder by its Firestore document ID */
+async getWorkOrderById(id: string): Promise<any | null> {
+  if (!id) {
+    console.error('Cannot fetch workorder: ID is missing');
+    return null;
+  }
 
-  const snapshot = await getDocs(q); return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  try {
+    const docRef = doc(this.firestore, 'WorkOrders', id);
+    const snap = await getDoc(docRef);
 
-}
-
- async getWorkOrderById(id: string): Promise<any | null> {
-    try {
-      const docRef = doc(this.firestore, 'WorkOrders', id);
-      const snap = await getDoc(docRef);
-      if (!snap.exists()) return null;
-      return { id: snap.id, ...snap.data() };
-    } catch (err) {
-      console.error('Error fetching work order by ID:', err);
+    if (!snap.exists()) {
+      console.warn(`WorkOrder with ID ${id} not found`);
       return null;
     }
+
+    // Return the data with the Firestore document ID included
+    return { id: snap.id, ...snap.data() };
+  } catch (err) {
+    console.error('Error fetching workorder by ID:', err);
+    return null;
+  }
+}
+
+
+  async getAllWorkOrders(): Promise<any[]> {
+    const q = query(this.workordersRef, orderBy('created', 'desc'));
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map(docSnap => ({
+      id: docSnap.id,        // Attach Firestore document ID
+      ...docSnap.data()
+    }));
   }
 
-   async updateWorkOrder(workorder: any): Promise<void> {
-    try {
-      const docRef = doc(this.firestore, 'WorkOrders', workorder.id);
-      await updateDoc(docRef, {
-        applianceID: workorder.applianceID,
-        notes: workorder.notes,
-        status: Number(workorder.status),
-        updated: Timestamp.now()
-      });
-      console.log(`WorkOrder ${workorder.id} updated`);
-    } catch (err) {
-      console.error('Error updating work order:', err);
-    }
+  async getActiveWorkOrders(): Promise<any[]> {
+    const q = query(this.workordersRef, where('status', '!=', 2));
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
   }
 
+  async createWorkOrder(workorder: any) {
+  const newWorkOrder = {
+    applianceID: workorder.applianceID,
+    notes: workorder.notes,
+    status: 0,
+    created: Timestamp.now()
+  };
+  const docRef = await addDoc(this.workordersRef, newWorkOrder);
+  console.log('WorkOrder created with ID:', docRef.id);
+  return docRef.id;  // This is the actual Firestore document ID
+}
 
-async createWorkOrder(workorder: any) {
-    try {
-      const colRef = collection(this.firestore, 'WorkOrders');
-
-      const newWorkOrder = {
-      ...workorder,
-      status: 0,              // Always default status to 0
-      created: Timestamp.now() // Use Firestore timestamp for creation time
-    };
-
-      const docRef = await addDoc(colRef, newWorkOrder);
-      console.log('WorkOrder created with ID:', docRef.id);
-      return docRef.id;
-    } catch (error) {
-      console.error('Error adding workorder:', error);
-      throw error;
-    }
-  }
-
-  /** Delete a work order by its document ID */
-  async deleteWorkOrder(id: string): Promise<void> {
-    const docRef = doc(this.firestore, 'WorkOrders', id);
-    await deleteDoc(docRef);
+  async updateWorkOrder(workorder: any): Promise<void> {
+    if (!workorder.id) throw new Error('Missing workorder ID');
+    const docRef = doc(this.firestore, 'WorkOrders', workorder.id);
+    await updateDoc(docRef, {
+      applianceID: workorder.applianceID,
+      notes: workorder.notes,
+      status: workorder.status,
+    });
   }
 
   async updateStatus(id: string, status: number): Promise<void> {
+    if (!id) throw new Error('Missing workorder ID');
     const docRef = doc(this.firestore, 'WorkOrders', id);
     await updateDoc(docRef, { status });
-    console.log(`WorkOrder ${id} status updated to ${status}`);
-  }
- 
-  async getWorkOrdersByAddress(address: string): Promise<any[]> {
-    const q = query(this.workordersRef, where('address', '==', address));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-    
   }
 
-  
+  async deleteWorkOrder(id: string): Promise<void> {
+    if (!id) throw new Error('Missing workorder ID');
+    const docRef = doc(this.firestore, 'WorkOrders', id);
+    await deleteDoc(docRef);
+  }
 }

@@ -338,7 +338,7 @@ form button{
     white-space: nowrap;
 }
 
-.work-order-side-panel select{
+select{
     font-family: 'Source Sans 3', sans-serif;
     font-weight: bold;
     font-size: 15px;
