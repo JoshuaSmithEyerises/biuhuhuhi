@@ -22,17 +22,18 @@ export const routes: Routes = [
     {path: 'login/fail', component: FailLoginComponent},
 
     // private dashboards
-    {
-    path: 'manager',
-    canActivate: [managerGuard],
-    children: [
-      { path: 'dashboard', component: ManagerDashboardComponent },
-      { path: 'passkeys', component: PasskeyManagerComponent },
-      { path: 'workorders', component: WorkOrderManagerComponent },
-      { path: 'appliances', component: ApplianceManagerComponent },
-      { path: 'fileworkorder', component: FileWorkOrderComponent },
-    ]
-  },
+   {
+  path: 'manager',
+  canActivate: [managerGuard],
+  children: [
+    { path: 'dashboard', component: ManagerDashboardComponent },
+    { path: 'passkeys', component: PasskeyManagerComponent },
+    { path: 'workorders', component: WorkOrderManagerComponent },
+    { path: 'appliances', component: ApplianceManagerComponent },
+    { path: 'fileworkorder', component: FileWorkOrderComponent },
+    { path: 'fileworkorder/:id', component: FileWorkOrderComponent }
+  ]
+}, 
     {
         path: 'tenant',
         canActivate: [tenantGuard],

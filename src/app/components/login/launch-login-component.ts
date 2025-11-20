@@ -12,13 +12,14 @@ import { AuthService } from '../../auth.service';
 <h1>I am a...</h1>
   <img src="Logo.png" alt="Logo">
 
-
+  <div class='launch-side'>
   <div class = 'left-side-buttons'>
   <a routerLink="/login/tenant">Tenant</a>
   <br>
   <a routerLink="/login/manager">Property Manager</a>
   <div class ='left-side-link'>
   <a routerLink="/login/fail">register new account</a>
+  </div>
   </div>
   </div>
   </div>

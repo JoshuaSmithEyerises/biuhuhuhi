@@ -3,6 +3,7 @@ import {
   Firestore,
   doc,
   deleteDoc,
+  getDoc,
   getDocs,
   collection,
   query,
@@ -12,7 +13,7 @@ import {
   DocumentData,
   addDoc,
   updateDoc,
-  Timestamp
+  Timestamp,
 } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
@@ -34,6 +35,34 @@ async getAllWorkOrders(): Promise<any[]>{
   const snapshot = await getDocs(q); return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
 }
+
+ async getWorkOrderById(id: string): Promise<any | null> {
+    try {
+      const docRef = doc(this.firestore, 'WorkOrders', id);
+      const snap = await getDoc(docRef);
+      if (!snap.exists()) return null;
+      return { id: snap.id, ...snap.data() };
+    } catch (err) {
+      console.error('Error fetching work order by ID:', err);
+      return null;
+    }
+  }
+
+   async updateWorkOrder(workorder: any): Promise<void> {
+    try {
+      const docRef = doc(this.firestore, 'WorkOrders', workorder.id);
+      await updateDoc(docRef, {
+        applianceID: workorder.applianceID,
+        notes: workorder.notes,
+        status: Number(workorder.status),
+        updated: Timestamp.now()
+      });
+      console.log(`WorkOrder ${workorder.id} updated`);
+    } catch (err) {
+      console.error('Error updating work order:', err);
+    }
+  }
+
 
 async createWorkOrder(workorder: any) {
     try {

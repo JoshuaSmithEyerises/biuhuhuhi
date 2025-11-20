@@ -157,6 +157,12 @@ Component specific styling*/
     top:45%;
 }
 
+.launch-side .left-side-buttons a{
+    margin-left: 200%;
+    font-size: 50px;
+    top: -5%;
+}
+
 .left-side-buttons a{
     white-space: nowrap;
     color: #3E78B2;
