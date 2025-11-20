@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink} from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../auth.service';
 
 @Component({
     selector: 'launch-login',
@@ -12,13 +12,14 @@ import { AuthService } from '../auth.service';
 <h1>I am a...</h1>
   <img src="Logo.png" alt="Logo">
 
-
+  <div class='launch-side'>
   <div class = 'left-side-buttons'>
   <a routerLink="/login/tenant">Tenant</a>
   <br>
   <a routerLink="/login/manager">Property Manager</a>
   <div class ='left-side-link'>
   <a routerLink="/login/fail">register new account</a>
+  </div>
   </div>
   </div>
   </div>

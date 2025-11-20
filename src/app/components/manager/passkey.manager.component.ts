@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PasskeyService } from '../services/passkey.service';
+import { PasskeyService } from '../../services/passkey.service';
 
 @Component({
   selector: 'app-passkey-manager',

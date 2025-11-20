@@ -3,6 +3,7 @@ import {
   Firestore,
   doc,
   deleteDoc,
+  getDoc,
   getDocs,
   collection,
   query,
@@ -11,7 +12,8 @@ import {
   CollectionReference,
   DocumentData,
   addDoc,
-  Timestamp
+  updateDoc,
+  Timestamp,
 } from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
@@ -33,6 +35,34 @@ async getAllWorkOrders(): Promise<any[]>{
   const snapshot = await getDocs(q); return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
 }
+
+ async getWorkOrderById(id: string): Promise<any | null> {
+    try {
+      const docRef = doc(this.firestore, 'WorkOrders', id);
+      const snap = await getDoc(docRef);
+      if (!snap.exists()) return null;
+      return { id: snap.id, ...snap.data() };
+    } catch (err) {
+      console.error('Error fetching work order by ID:', err);
+      return null;
+    }
+  }
+
+   async updateWorkOrder(workorder: any): Promise<void> {
+    try {
+      const docRef = doc(this.firestore, 'WorkOrders', workorder.id);
+      await updateDoc(docRef, {
+        applianceID: workorder.applianceID,
+        notes: workorder.notes,
+        status: Number(workorder.status),
+        updated: Timestamp.now()
+      });
+      console.log(`WorkOrder ${workorder.id} updated`);
+    } catch (err) {
+      console.error('Error updating work order:', err);
+    }
+  }
+
 
 async createWorkOrder(workorder: any) {
     try {
@@ -59,7 +89,12 @@ async createWorkOrder(workorder: any) {
     await deleteDoc(docRef);
   }
 
-  /** Example: Get work orders by address (requires address field to be indexed) */
+  async updateStatus(id: string, status: number): Promise<void> {
+    const docRef = doc(this.firestore, 'WorkOrders', id);
+    await updateDoc(docRef, { status });
+    console.log(`WorkOrder ${id} status updated to ${status}`);
+  }
+ 
   async getWorkOrdersByAddress(address: string): Promise<any[]> {
     const q = query(this.workordersRef, where('address', '==', address));
     const snapshot = await getDocs(q);
@@ -67,5 +102,8 @@ async createWorkOrder(workorder: any) {
       id: doc.id,
       ...doc.data()
     }));
+    
   }
+
+  
 }

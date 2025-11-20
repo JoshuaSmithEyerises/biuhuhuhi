@@ -1,13 +1,17 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { AuthService } from '../auth.service';
-import { WorkOrderService } from '../services/workorder.service';
+import { Router, RouterLink,} from '@angular/router';
+import { AuthService } from '../../auth.service';
+import { WorkOrderService } from '../../services/workorder.service';
+import { FormsModule } from '@angular/forms';
+import { Firestore } from '@angular/fire/firestore';
+import { updateDoc, doc } from '@angular/fire/firestore';
+
 
 @Component({
     selector: 'app-manager-dashboard',
     standalone: true,
-    imports: [CommonModule, RouterLink],
+    imports: [CommonModule, RouterLink, FormsModule],
     template: `
     <div>
       <h1>Welcome, {{ auth.manager?.email }}</h1>
@@ -23,13 +27,21 @@ import { WorkOrderService } from '../services/workorder.service';
   </li>
 
   <li *ngFor="let w of workorders" style="margin-top:10px;">
-    <div class="table-cell">{{ w.applianceID }}</div>
-    <div class="table-cell">{{ w.notes }}</div>
-    <div class="table-cell">{{ getStatusText(w.status) }}</div>
-    <div class="table-cell"><button (click)="delete(w.id)">Delete</button></div>
-  </li>
+  <div class="table-cell">{{ w.applianceID }}</div>
+  <div class="table-cell">{{ w.notes }}</div>
+  <div class="table-cell">
+    <select [(ngModel)]="w.status" (change)="updateStatus(w)">
+      <option [ngValue]=0>New</option>
+      <option [ngValue]=1>In Progress</option>
+      <option [ngValue]=2>Completed</option>
+    </select>
+  </div>
+  <div class="table-cell">
+    <button (click)="delete(w.id)">Delete</button>
+  </div>
+</li>
+
 </ul>
-</div>
 
 <div class= 'left-side-buttons'>
   <a routerLink="/manager/passkeys">Manage Tenant Keys</a>
@@ -50,7 +62,8 @@ export class ManagerDashboardComponent implements OnInit {
         public auth: AuthService,
         private router: Router,
         private workOrderService: WorkOrderService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private firestore: Firestore,
     ) { }
 
     async ngOnInit() {
@@ -68,6 +81,20 @@ export class ManagerDashboardComponent implements OnInit {
         await this.auth.logout();
         this.router.navigate(['/login/manager']);
     }
+
+    async updateStatus(workorder: any) {
+    try {
+      const docRef = doc(this.firestore, 'WorkOrders', workorder.id);
+      await updateDoc(docRef, { status: workorder.status });
+      console.log(`Work order ${workorder.id} updated to status ${workorder.status}`);
+
+  this.workorders = await this.workOrderService.getActiveWorkOrders();
+    this.cdr.detectChanges();
+
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  }
 
     getStatusText(status: number): string {
         switch (status) {

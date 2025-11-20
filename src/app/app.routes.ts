@@ -1,14 +1,15 @@
 import { Routes } from '@angular/router';
-import { ManagerLoginComponent } from './login/manager-login-component';
-import { TenantLoginComponent } from './login/tenant-login-component';
-import { FailLoginComponent } from './login/fail-login.component';
-import { LaunchLoginComponent } from './login/launch-login-component';
-import { ManagerDashboardComponent } from './manager/manager-dashboard.component';
-import { TenantDashboardComponent } from './tenant/tenant-dashboard-component';
+import { ManagerLoginComponent } from './components/login/manager-login-component';
+import { TenantLoginComponent } from './components/login/tenant-login-component';
+import { FailLoginComponent } from './components/login/fail-login.component';
+import { LaunchLoginComponent } from './components/login/launch-login-component';
+import { ManagerDashboardComponent } from './components/manager/manager-dashboard.component';
+import { TenantDashboardComponent } from './components/tenant/tenant-dashboard-component';
 import { managerGuard, tenantGuard } from './auth.guard';
-import { PasskeyManagerComponent } from './manager/passkey.manager.component';
-import { WorkOrderManagerComponent } from './manager/workorder.manager.component';
-import { ApplianceManagerComponent } from './manager/appliance.manager.component';
+import { PasskeyManagerComponent } from './components/manager/passkey.manager.component';
+import { WorkOrderManagerComponent } from './components/manager/workorder.manager.component';
+import { ApplianceManagerComponent } from './components/manager/appliance.manager.component';
+import { FileWorkOrderComponent } from './components/file-workorder.component';
 
 // Creates guarded routes between pages; This is the "route" object all the components reference
 export const routes: Routes = [
@@ -21,20 +22,26 @@ export const routes: Routes = [
     {path: 'login/fail', component: FailLoginComponent},
 
     // private dashboards
+   {
+  path: 'manager',
+  canActivate: [managerGuard],
+  children: [
+    { path: 'dashboard', component: ManagerDashboardComponent },
+    { path: 'passkeys', component: PasskeyManagerComponent },
+    { path: 'workorders', component: WorkOrderManagerComponent },
+    { path: 'appliances', component: ApplianceManagerComponent },
+    { path: 'fileworkorder', component: FileWorkOrderComponent },
+    { path: 'fileworkorder/:id', component: FileWorkOrderComponent }
+  ]
+}, 
     {
-    path: 'manager',
-    canActivate: [managerGuard],
-    children: [
-      { path: 'dashboard', component: ManagerDashboardComponent },
-      { path: 'passkeys', component: PasskeyManagerComponent },
-      { path: 'workorders', component: WorkOrderManagerComponent },
-      { path: 'appliances', component: ApplianceManagerComponent },
-    ]
-  },
-    {
-        path: 'tenant/dashboard',
-        component: TenantDashboardComponent,
+        path: 'tenant',
         canActivate: [tenantGuard],
+        children: [
+          { path: 'dashboard', component: TenantDashboardComponent},
+          { path: 'fileworkorder', component: FileWorkOrderComponent },
+        ]
+        
     },
 
     // catchall redirect

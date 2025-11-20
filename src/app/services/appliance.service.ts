@@ -15,7 +15,7 @@ import {
 
 export interface Appliance {
   id: string;
-  address: string;
+  address?: string;
   type?: string;
   model?: string;
   serial?: string;

@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../../auth.service';
 import { FormsModule } from '@angular/forms';
-import { ApplianceService } from '../services/appliance.service';
+import { ApplianceService } from '../../services/appliance.service';
 
 @Component({
   selector: 'app-manager-dashboard',
@@ -24,10 +24,10 @@ import { ApplianceService } from '../services/appliance.service';
         <input type="text" placeholder="Serial Number" [(ngModel)]="newAppliance.serial" name="serial" required />
         <button type="submit">Add Appliance</button>
       </form>
-
-      
+      <h2>All Appliances</h2>
+      <div class='wide-table'>
       <ul *ngIf="appliances.length > 0; else noAppliances">
-        <h2 *ngIf="appliances.length > 0">All Appliances:</h2>
+        <h2 *ngIf="appliances.length > 0"></h2>
         <li>
           <div class='table-cell'><strong>ApplianceID</strong></div>
           <div class='table-cell'><strong>Address</strong></div>
@@ -35,7 +35,8 @@ import { ApplianceService } from '../services/appliance.service';
           <div class='table-cell'><strong>Model</strong></div>
           <div class='table-cell'><strong>Manufacture Year</strong></div>
           <div class='table-cell'><strong>Serial No</strong></div>
-          <div class='table-cell'><strong></strong></div>
+          <div class='table-cell'><strong>&nbsp;</strong></div>
+           <div class='table-cell'><strong>&nbsp;</strong></div>
         </li>
         <li *ngFor="let appliance of appliances">
           <div class='table-cell'>{{ appliance.id }}</div>
@@ -44,9 +45,11 @@ import { ApplianceService } from '../services/appliance.service';
           <div class='table-cell'>{{ appliance.model }}</div>
           <div class='table-cell'>{{ appliance.Manufacture_Year }}</div>
           <div class='table-cell'>{{ appliance.serial }}</div>
+           <div class='table-cell'><button type="button" (click)="goToWorkOrder(appliance.id)">File WorkOrder</button></div>
           <div class='table-cell'><button (click)="delete(appliance.id)">Delete</button></div>
         </li>
       </ul>
+</div>
 
       <ng-template #noAppliances>
         <p>No appliances found.</p>
@@ -61,7 +64,7 @@ export class ApplianceManagerComponent implements OnInit {
     address: '',
     type: '',
     model: '',
-    Manufacture_Year: null,
+    Manufacture_Year: 0,
     serial: ''
   };
 
@@ -85,7 +88,7 @@ export class ApplianceManagerComponent implements OnInit {
         address: '',
         type: '',
         model: '',
-        Manufacture_Year: null,
+        Manufacture_Year: 0,
         serial: ''
       };
 
@@ -110,4 +113,12 @@ export class ApplianceManagerComponent implements OnInit {
     await this.auth.logout();
     this.router.navigate(['/login/manager']);
   }
+
+  goToWorkOrder(applianceId: string) {
+  // Navigate to the FileWorkOrder page
+  // Adjust the path depending on whether managers use '/manager/fileworkorder' or tenants '/tenant/fileworkorder'
+  this.router.navigate(['/manager/fileworkorder'], { 
+    queryParams: { applianceID: applianceId } 
+  });
+}
 }
