@@ -43,8 +43,9 @@ import { FormsModule } from '@angular/forms';
   <p>No appliances found for your address.</p>
 </ng-template>
    </div>
+   <form>
    <button (click)="logout()">Logout</button>
-
+</form>
   
   `
 })

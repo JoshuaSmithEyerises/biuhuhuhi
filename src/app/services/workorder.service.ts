@@ -11,6 +11,7 @@ import {
   CollectionReference,
   DocumentData,
   addDoc,
+  updateDoc,
   Timestamp
 } from '@angular/fire/firestore';
 
@@ -59,7 +60,12 @@ async createWorkOrder(workorder: any) {
     await deleteDoc(docRef);
   }
 
-  /** Example: Get work orders by address (requires address field to be indexed) */
+  async updateStatus(id: string, status: number): Promise<void> {
+    const docRef = doc(this.firestore, 'WorkOrders', id);
+    await updateDoc(docRef, { status });
+    console.log(`WorkOrder ${id} status updated to ${status}`);
+  }
+ 
   async getWorkOrdersByAddress(address: string): Promise<any[]> {
     const q = query(this.workordersRef, where('address', '==', address));
     const snapshot = await getDocs(q);
@@ -67,5 +73,8 @@ async createWorkOrder(workorder: any) {
       id: doc.id,
       ...doc.data()
     }));
+    
   }
+
+  
 }
