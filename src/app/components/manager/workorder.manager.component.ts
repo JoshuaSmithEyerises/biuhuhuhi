@@ -36,7 +36,6 @@ import { Firestore } from '@angular/fire/firestore';
     <div class="table-cell"><strong>Status</strong></div>
     <div class="table-cell"><strong>Date Created</strong></div>
     <div class="table-cell"><strong></strong></div>
-    <div class="table-cell"><strong></strong></div>
      <div class="table-cell"><strong></strong></div>
   </li>
 
@@ -44,15 +43,14 @@ import { Firestore } from '@angular/fire/firestore';
     <div class="table-cell">{{ w.id }}</div>
     <!--<div class="table-cell">{{ w.address }}</div>-->
     <div class="table-cell">{{ w.notes }}</div>
-    <div class="table-cell">{{ getStatusText(w.status) }}</div>
-    <div class="table-cell">{{ w.created | date: 'medium' }}</div>
-     <div class="table-cell">
+    <div class="table-cell">
     <select [(ngModel)]="w.status" (change)="updateStatus(w)">
       <option [ngValue]=0>New</option>
       <option [ngValue]=1>In Progress</option>
       <option [ngValue]=2>Completed</option>
     </select>
   </div>
+    <div class="table-cell">{{ w.created | date: 'medium' }}</div>
   <div class="table-cell">
   <button (click)="edit(w.id)">Edit</button>
 </div>
