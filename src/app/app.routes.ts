@@ -9,6 +9,7 @@ import { managerGuard, tenantGuard } from './auth.guard';
 import { PasskeyManagerComponent } from './components/manager/passkey.manager.component';
 import { WorkOrderManagerComponent } from './components/manager/workorder.manager.component';
 import { ApplianceManagerComponent } from './components/manager/appliance.manager.component';
+import { FileWorkOrderComponent } from './components/file-workorder.component';
 
 // Creates guarded routes between pages; This is the "route" object all the components reference
 export const routes: Routes = [
@@ -29,12 +30,17 @@ export const routes: Routes = [
       { path: 'passkeys', component: PasskeyManagerComponent },
       { path: 'workorders', component: WorkOrderManagerComponent },
       { path: 'appliances', component: ApplianceManagerComponent },
+      { path: 'fileworkorder', component: FileWorkOrderComponent },
     ]
   },
     {
-        path: 'tenant/dashboard',
-        component: TenantDashboardComponent,
+        path: 'tenant',
         canActivate: [tenantGuard],
+        children: [
+          { path: 'dashboard', component: TenantDashboardComponent},
+          { path: 'fileworkorder', component: FileWorkOrderComponent },
+        ]
+        
     },
 
     // catchall redirect

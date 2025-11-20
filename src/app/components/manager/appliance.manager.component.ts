@@ -61,7 +61,7 @@ export class ApplianceManagerComponent implements OnInit {
     address: '',
     type: '',
     model: '',
-    Manufacture_Year: null,
+    Manufacture_Year: 0,
     serial: ''
   };
 
@@ -85,7 +85,7 @@ export class ApplianceManagerComponent implements OnInit {
         address: '',
         type: '',
         model: '',
-        Manufacture_Year: null,
+        Manufacture_Year: 0,
         serial: ''
       };
 

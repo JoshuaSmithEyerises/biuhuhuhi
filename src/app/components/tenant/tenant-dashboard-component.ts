@@ -15,13 +15,6 @@ import { FormsModule } from '@angular/forms';
   <h1>Welcome, {{ auth.tenant?.address }}</h1>
   <h2>Access granted with passkey: {{ auth.tenant?.passkey }}</h2>
 
- <form (ngSubmit)="addWorkOrder()">
-  <input type="text" placeholder="applianceID" [(ngModel)]="newWorkOrder.applianceID" name="applianceID" required />
-  <input type="text" placeholder="Notes" [(ngModel)]="newWorkOrder.notes" name="notes" required />
-  <button type="submit">File WorkOrder</button>
-</form>
-
-
 <ul *ngIf="appliances.length > 0; else noAppliances">
 
   <li class="header-row">
@@ -37,7 +30,7 @@ import { FormsModule } from '@angular/forms';
     <div class='table-cell'>{{ appliance.serial }}</div>
 
     <div class="table-cell">
-      <button type="button" (click)="prepareWorkOrder(appliance.id)">
+       <button type="button" (click)="goToWorkOrder(appliance.id)">
         File WorkOrder
       </button>
     </div>
@@ -91,6 +84,12 @@ export class TenantDashboardComponent implements OnInit {
     console.log('Appliances found:', this.appliances);
 
     this.cdr.detectChanges(); // <-- Tell Angular to update the view
+  }
+
+  goToWorkOrder(applianceId: string) {
+    this.router.navigate(['/tenant/fileworkorder'], {
+      queryParams: { applianceID: applianceId }
+    });
   }
 
   async addWorkOrder() {
