@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink,} from '@angular/router';
 import { AuthService } from '../../auth.service';
 import { WorkOrderService } from '../../services/workorder.service';
 import { FormsModule } from '@angular/forms';
