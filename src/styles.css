@@ -333,6 +333,10 @@ form button{
     text-align: center;
 }
 
+.work-order-side-panel .table-cell{
+    max-width: 150px;
+}
+
 .work-order-side-panel h2{
     text-align: center;
     white-space: nowrap;

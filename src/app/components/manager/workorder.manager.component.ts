@@ -22,6 +22,7 @@ import { ApplianceService } from '../../services/appliance.service';
 
     <h2>All Work Orders</h2>
 
+    <div class="wide-table">
   <ul *ngIf="workorders.length">
     <!-- Table Header -->
     <li class="table-header">
@@ -32,7 +33,6 @@ import { ApplianceService } from '../../services/appliance.service';
        <div class="table-cell"><strong>&nbsp;</strong></div>
     </li>
 
-    <!-- Table Rows -->
     <li *ngFor="let w of workorders" class="table-row">
       <div class="table-cell">{{ w.applianceID }}</div>
       <div class="table-cell">{{ w.notes }}</div>
@@ -53,7 +53,7 @@ import { ApplianceService } from '../../services/appliance.service';
   </ul>
 
   <p *ngIf="!workorders.length">No work orders found.</p>
-
+</div>
     
   `
 })

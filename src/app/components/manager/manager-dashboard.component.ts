@@ -27,7 +27,7 @@ import { updateDoc, doc } from '@angular/fire/firestore';
   </li>
 
   <li *ngFor="let w of workorders" style="margin-top:10px;">
-  <div class="table-cell">{{ w.id }}</div>
+  <div class="table-cell">{{ w.applianceID }}</div>
   <div class="table-cell">{{ w.notes }}</div>
   <div class="table-cell">
     <select [(ngModel)]="w.status" (change)="updateStatus(w)">

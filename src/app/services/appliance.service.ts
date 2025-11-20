@@ -9,7 +9,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
-  DocumentData,
+updateDoc,
   CollectionReference,
 } from '@angular/fire/firestore';
 
@@ -50,6 +50,20 @@ export class ApplianceService {
       ...doc.data()
     }));
   }
+
+ async updateAppliance(appliance: any): Promise<void> {
+  if (!appliance.id) throw new Error('Cannot update appliance: ID missing');
+  console.log('Updating appliance in Firestore:', appliance);
+  const docRef = doc(this.firestore, 'Appliances', appliance.id);
+  await updateDoc(docRef, {
+    address: appliance.address,
+    type: appliance.type,
+    model: appliance.model,
+    Manufacture_Year: appliance.Manufacture_Year,
+    serial: appliance.serial
+  });
+  console.log('Appliance updated successfully in Firestore');
+}
 
  async getApplianceById(id: string): Promise<Appliance | undefined> {
   const docRef = doc(this.firestore, 'Appliances', id);
